@@ -209,10 +209,12 @@ function randomGradient() {
 // }
 
 const circleContainer = document.getElementById('circles');
-const ctx = circleContainer.getContext('2d');
+const ctx = circleContainer.getContext('2d', { alpha: true });
 var circles = [];
 const addCirc = (x, y) => {
-    circles.append([x, y]);
+    const h = Math.random() * 360, s = Math.random() * 60 + 20, l = Math.random() * 20 + 40;
+    circles.push([x, y, h, s, l, 1]);
+    console.log(circles);
 };
 
 document.addEventListener('click', (e) => {
@@ -227,17 +229,25 @@ console.log(title);
 //     // Update a progress bar or time display here
 // });
 
+var prevTime = 0;
 function update() {
     const time = window.performance.now() / 1000;
+    const dt = time - prevTime;
+    prevTime = time;
+    // console.log(time);
     // console.log(time);
     title.style.fontSize = `${time < 1.6 ? 120 * (time * (2 - time)) : 76.8}px`;
 
     for (var c of circles) {
         // Draw a filled circle
+        var [x, y, h, s, l, a] = c;
         ctx.beginPath();
-        ctx.arc(c[0], c[1], 60, 0, Math.PI * 2);
-        ctx.fillStyle = "blue"; // Set fill color
+        ctx.arc(x, y, 60, 0, Math.PI * 2);
+        ctx.globalAlpha = Math.max(0, a);
+        ctx.fillStyle = `hsla(${h}deg, ${s}%, ${l}%)`; // Set fill color
         ctx.fill();
+        c[5] -= dt;
+        // console.log(dt);
     }
     
     // Recursively call requestAnimationFrame to schedule the next update
